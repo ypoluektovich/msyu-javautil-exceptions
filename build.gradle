@@ -2,6 +2,7 @@ group 'org.msyu.javautil'
 version '0.1.0'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -16,4 +17,20 @@ dependencies {
 
 test {
     useTestNG()
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+}
+
+publishing {
+    publications {
+        main(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+        }
+    }
 }
