@@ -150,10 +150,48 @@ public class CloseableChainExamples extends CloseableChainTestBase {
         }
     }
 
+    /**
+     * If you need to use the outputs from inside the chain, save references to them after constructing.
+     */
+    @Test
+    public void example06_UsingOutputsFromInsideTheChain() throws Exception {
+        class ReferenceContainer {
+            private Object first;
+            private Object second;
+        }
+        ReferenceContainer referenceContainer = new ReferenceContainer();
+
+        CloseableChain<Object, Exception> chain = newCloseableChain()
+                .chain(arg -> referenceContainer.first = constructor(arg), this::destructor)
+                .chain(arg -> referenceContainer.second = constructor(arg), this::destructor)
+                .chain(this::constructor, this::destructor);
+
+        youAreAPirate(referenceContainer.first, referenceContainer.second, chain.getOutput());
+
+        CloseableChain.close(chain);
+    }
+
+
+    /**
+     * A placeholder method to use for constructor imitation, for when a {@link Dummy} is too much.
+     *
+     * @param arg the previous chain output.
+     *
+     * @return {@code null}.
+     *
+     * @throws Exception doesn't actually throw anything.
+     */
     private Object constructor(Object arg) throws Exception {
         return null;
     }
 
+    /**
+     * A placeholder method to use for destructor imitation, for when a {@link Dummy} is too much.
+     *
+     * @param arg the chain link output to close.
+     *
+     * @throws Exception doesn't actually throw anything.
+     */
     private void destructor(Object arg) throws Exception {
     }
 
