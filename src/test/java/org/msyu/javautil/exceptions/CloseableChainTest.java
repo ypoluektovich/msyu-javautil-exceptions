@@ -2,18 +2,15 @@ package org.msyu.javautil.exceptions;
 
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
@@ -21,52 +18,10 @@ import static org.msyu.javautil.exceptions.CloseableChain.newCloseableChain;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-public class CloseableChainTest {
-
-    private class Dummy {
-
-        private final boolean throwFromDestructor;
-
-        Dummy(boolean throwFromConstructor, boolean throwFromDestructor, Object... args) throws Exception {
-            ++levelCounter;
-            if (throwFromConstructor) {
-                throw new Exception("c" + (levelCounter--));
-            }
-            tracer.constructorSucceeds(levelCounter);
-            this.throwFromDestructor = throwFromDestructor;
-        }
-
-        void close() throws Exception {
-            try {
-                if (throwFromDestructor) {
-                    throw new Exception("d" + levelCounter);
-                }
-                tracer.destructorSucceeds(levelCounter);
-            } finally {
-                --levelCounter;
-            }
-        }
-
-    }
-
-    private interface Tracer {
-        void constructorSucceeds(int level);
-        void destructorSucceeds(int level);
-    }
-
-    private Tracer tracer;
-
-    private int levelCounter;
-
-    @BeforeMethod
-    public void setUp() {
-        tracer = Mockito.mock(Tracer.class);
-        levelCounter = 0;
-    }
-
+public class CloseableChainTest extends CloseableChainTestBase {
 
     @Test
-    public void allIsWell() throws Exception {
+    public void verifyOrderWithNoExceptions() throws Exception {
         CloseableChain<Dummy, Exception> chain = newCloseableChain()
                 .chain(__ -> new Dummy(false, false), Dummy::close)
                 .chain(prev -> new Dummy(false, false, prev), Dummy::close);
@@ -107,12 +62,7 @@ public class CloseableChainTest {
             assert expectedException == null : "expected an exception, but none was thrown";
         } catch (Exception e) {
             assert expectedException != null : "expected no exception, but one or more was thrown";
-            assertEquals(e.getMessage(), expectedException, "root exception");
-            assertEquals(
-                    Arrays.stream(e.getSuppressed()).map(Throwable::getMessage).collect(Collectors.toList()),
-                    expectedSuppressedExceptions,
-                    "suppressed exceptions"
-            );
+            checkRootAndSuppressedExceptions(e, expectedException, expectedSuppressedExceptions);
         }
     }
 

@@ -4,6 +4,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
+import static org.msyu.javautil.exceptions.ExampleUtils.youAreAPirate;
 import static org.msyu.javautil.exceptions.ParameterizedAutoCloseable.wrap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -81,13 +82,6 @@ public class ParameterizedAutoCloseableExamples {
         public InconstructibleObject() throws IOException {
             throw new IOException("constructor");
         }
-    }
-
-    /**
-     * Do what you want 'cause a pirate is free!
-     */
-    private static void youAreAPirate(Object... yarrHarr) {
-        // this is just a dummy method that eats any parameters
     }
 
 }
