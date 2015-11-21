@@ -16,7 +16,7 @@ public class ParameterizedAutoCloseableExamples {
      * <p>Note that the code inside the try block can't use the wrapped object.
      * See {@linkplain #example02_ConstructAndSaveReferenceBeforeWrapping() this example} for how to fix that.</p>
      */
-    @Test(expectedExceptions = IOException.class)
+    @Test
     public void example01_ProofOfConcept() throws IOException {
         try (ParameterizedAutoCloseable<IOException> pac = wrap(new CloseableObject(), CloseableObject::customClose)) {
             youAreAPirate(pac);
@@ -26,7 +26,7 @@ public class ParameterizedAutoCloseableExamples {
     /**
      * You can construct the object and save a reference to it before wrapping it with ParameterizedAutoCloseable.
      */
-    @Test(expectedExceptions = IOException.class)
+    @Test(expectedExceptions = IOException.class, expectedExceptionsMessageRegExp = "destructor")
     public void example02_ConstructAndSaveReferenceBeforeWrapping() throws IOException {
         UncloseableObject usefulObject = new UncloseableObject();
         try (ParameterizedAutoCloseable<IOException> pac = wrap(usefulObject, CloseableObject::customClose)) {
@@ -87,7 +87,7 @@ public class ParameterizedAutoCloseableExamples {
      * Do what you want 'cause a pirate is free!
      */
     private static void youAreAPirate(Object... yarrHarr) {
-        // this is just a dummy method
+        // this is just a dummy method that eats any parameters
     }
 
 }
