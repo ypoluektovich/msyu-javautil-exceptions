@@ -1,8 +1,11 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.4'
+}
+
 group 'org.msyu.javautil'
 version '0.1.0'
-
-apply plugin: 'java'
-apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -36,6 +39,28 @@ publishing {
             artifact sourceJar {
                 classifier 'sources'
             }
+        }
+    }
+}
+
+bintray {
+    user = bintray_user
+    key = bintray_apiKey
+    publications = ['main']
+    dryRun = false
+    publish = false
+    pkg {
+        repo = 'msyu'
+        name = 'msyu-javautil-exceptions'
+        desc = 'A library of utilities to facilitate correct Java exception handling'
+        websiteUrl = 'https://github.com/ypoluektovich/msyu-javautil-exceptions'
+        issueTrackerUrl = 'https://github.com/ypoluektovich/msyu-javautil-exceptions/issues'
+        vcsUrl = 'https://github.com/ypoluektovich/msyu-javautil-exceptions.git'
+        licenses = ['MPL-2.0']
+        publicDownloadNumbers = true
+        version {
+            name = project.version
+            vcsTag = 'v' + project.version
         }
     }
 }
