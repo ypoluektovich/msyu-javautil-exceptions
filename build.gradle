@@ -1,22 +1,27 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'signing'
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
 }
 
 group 'org.msyu.javautil'
 version '1.0.0'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    withSourcesJar()
+    withJavadocJar()
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile 'org.testng:testng:6.9.+'
-    testCompile 'org.mockito:mockito-core:1.10.+'
+    testImplementation 'org.testng:testng:6.9.+'
+    testImplementation 'org.mockito:mockito-core:1.10.+'
 }
 
 sourceSets {
@@ -27,40 +32,56 @@ test {
     useTestNG()
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-}
-
 publishing {
     publications {
         main(MavenPublication) {
             from components.java
+            artifactId 'exceptions'
 
-            artifact sourceJar {
-                classifier 'sources'
+            pom {
+                name = 'msyu-javautil-exceptions'
+                description = 'A library of utilities to facilitate correct Java exception handling'
+                url = 'https://github.com/ypoluektovich/msyu-javautil-exceptions'
+
+                licenses {
+                    license {
+                        name = 'Mozilla Public License Version 2.0'
+                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'ypoluektovich'
+                        name = 'Yanus Poluektovich'
+                        email = 'ypoluektovich@gmail.com'
+                        url = 'https://github.com/ypoluektovich'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:https://github.com/ypoluektovich/msyu-javautil-exceptions.git'
+                    developerConnection = 'scm:git:https://github.com/ypoluektovich/msyu-javautil-exceptions.git'
+                    url = 'https://github.com/ypoluektovich/msyu-javautil-exceptions'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'OSSRH'
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
             }
         }
     }
 }
 
-bintray {
-    user = bintray_user
-    key = bintray_apiKey
-    publications = ['main']
-    dryRun = false
-    publish = false
-    pkg {
-        repo = 'msyu'
-        name = 'msyu-javautil-exceptions'
-        desc = 'A library of utilities to facilitate correct Java exception handling'
-        websiteUrl = 'https://github.com/ypoluektovich/msyu-javautil-exceptions'
-        issueTrackerUrl = 'https://github.com/ypoluektovich/msyu-javautil-exceptions/issues'
-        vcsUrl = 'https://github.com/ypoluektovich/msyu-javautil-exceptions.git'
-        licenses = ['MPL-2.0']
-        publicDownloadNumbers = true
-        version {
-            name = project.version
-            vcsTag = 'v' + project.version
-        }
-    }
+signing {
+    useGpgCmd()
+    sign publishing.publications.main
 }
