@@ -3,8 +3,11 @@ package org.msyu.javautil.exceptions;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.msyu.javautil.exceptions.ExampleUtils.youAreAPirate;
+import static org.msyu.javautil.exceptions.ParameterizedAutoCloseable.Locks.lock;
 import static org.msyu.javautil.exceptions.ParameterizedAutoCloseable.wrap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -61,6 +64,17 @@ public class ParameterizedAutoCloseableExamples {
         Object usefulObject = new Object();
         try (ParameterizedAutoCloseable<RuntimeException> pac = wrap(usefulObject, Object::hashCode)) {
             youAreAPirate(usefulObject);
+        }
+    }
+
+    /**
+     * There are convenience methods that wrap things from the standard library. For example, locks.
+     */
+    @Test
+    public void example05_Lock() {
+        Lock someLock = new ReentrantLock();
+        try (ParameterizedAutoCloseable<RuntimeException> pac = lock(someLock)) {
+            youAreAPirate();
         }
     }
 
