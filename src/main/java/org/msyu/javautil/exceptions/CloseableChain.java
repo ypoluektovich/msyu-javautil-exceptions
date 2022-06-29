@@ -39,6 +39,20 @@ public final class CloseableChain<I, C extends Exception> {
         return new CloseableChain<>(newOutput, destructor, this);
     }
 
+    public final <X extends Exception>
+    CloseableChain<I, C> chainEffects(
+            ConsumerWithException<? super I, X> constructor,
+            ConsumerWithException<? super I, ? extends C> destructor
+    ) throws X {
+        try {
+            constructor.accept(output);
+        } catch (Throwable x) {
+            close(this, x);
+            throw x;
+        }
+        return new CloseableChain<>(output, destructor, this);
+    }
+
     public final I getOutput() {
         return output;
     }

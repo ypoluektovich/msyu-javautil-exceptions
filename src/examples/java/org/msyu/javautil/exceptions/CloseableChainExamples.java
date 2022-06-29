@@ -171,6 +171,20 @@ public class CloseableChainExamples extends CloseableChainTestBase {
         CloseableChain.close(chain);
     }
 
+    /**
+     * There is a convenience method for when you need to produce some side effects on the previous output
+     * without creating a new object to pass further down the chain.
+     */
+    @Test
+    public void example07_ChainEffects() throws Exception {
+        CloseableChain<Void, Exception> chain = newCloseableChain()
+                .chainEffects(this::constructor, this::destructor);
+
+        youAreAPirate(chain.getOutput());
+
+        CloseableChain.close(chain);
+    }
+
 
     /**
      * A placeholder method to use for constructor imitation, for when a {@link Dummy} is too much.
